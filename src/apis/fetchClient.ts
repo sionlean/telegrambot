@@ -1,17 +1,14 @@
 // External Modules
 const fetch = require("node-fetch");
 
-// Local Modules
-import IO from "../lib/IO";
-
 // Constants
-import { HTTP_METHOD, SERVER_URL } from "../constants";
+import { HTTP_METHOD } from "../constants";
 
 export default class FetchClient {
   private access_token: string | undefined = undefined;
   private serverUrl: string;
 
-  constructor(serverUrl = SERVER_URL) {
+  constructor(serverUrl = process.env.SERVER_URL!) {
     this.serverUrl = serverUrl;
     this.setToken();
   }
@@ -98,11 +95,10 @@ export default class FetchClient {
   };
 
   private setToken = async (): Promise<void> => {
-    const url = `${SERVER_URL}/auth/getToken`;
+    const url = `${process.env.SERVER_URL}/auth/getToken`;
     try {
-      const password = await IO.ask("Enter your password: ");
       const response = await this.customFetch(HTTP_METHOD.POST, url, {
-        password,
+        password: process.env.SERVER_PASSWORD,
       });
 
       if (response.error) throw response.error;

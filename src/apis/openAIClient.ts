@@ -11,11 +11,11 @@ import {
 } from "../interfaces/openAIApiInterfaces";
 
 // Constants
-import { API_OPEN_AI, SERVER_URL } from "../constants";
+import { API_OPEN_AI } from "../constants";
 
 export default class OpenAIClient extends FetchClient {
   constructor() {
-    super(`${SERVER_URL}/openAI`);
+    super(`${process.env.SERVER_URL}/openAI`);
   }
 
   changeModel = async (model: string): Promise<ChangeModelResp> => {

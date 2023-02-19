@@ -29,5 +29,3 @@ export enum HTTP_METHOD {
   POST = "POST",
   PUT = "PUT",
 }
-
-export const SERVER_URL = "http:localhost:3000";
