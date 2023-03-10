@@ -3,9 +3,9 @@ import FetchClient from "./fetchClient";
 
 // Interfaces
 import {
+  AIResp,
   ChangeModelResp,
   CurrentModelResp,
-  GenerateResponseResp,
   ListAvailableModelsResp,
   ListOpenAIModelResp,
 } from "../interfaces/openAIApiInterfaces";
@@ -26,8 +26,24 @@ export default class OpenAIClient extends FetchClient {
     return await this.get(API_OPEN_AI.CURRENT_MODEL, {});
   };
 
-  generateResponse = async (text: string): Promise<GenerateResponseResp> => {
-    return await this.post(API_OPEN_AI.GENERATE_RESPONSE, { text });
+  generateCode = async (
+    text: string,
+    includePrevResp: boolean
+  ): Promise<AIResp> => {
+    return await this.post(API_OPEN_AI.GENERATE_CODE, {
+      includePrevResp,
+      text,
+    });
+  };
+
+  generateResponse = async (
+    text: string,
+    includePrevResp: boolean
+  ): Promise<AIResp> => {
+    return await this.post(API_OPEN_AI.GENERATE_RESPONSE, {
+      includePrevResp,
+      text,
+    });
   };
 
   listAvailableModels = async (): Promise<ListAvailableModelsResp> => {

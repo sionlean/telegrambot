@@ -17,6 +17,8 @@ export default class OpenAIBot extends BaseBot {
     super(token);
   }
 
+  protected customStart = async (): Promise<void> => {};
+
   protected executeCommand = async (
     chatId: number,
     message: Message
@@ -25,11 +27,26 @@ export default class OpenAIBot extends BaseBot {
     const isAdminAICommand = this.isAdminAICommand(textWithoutMention);
     const isAdminUser = checkIsAdminUsername(message?.from?.username);
 
-    isAdminAICommand
-      ? isAdminUser
+    if (isAdminAICommand) {
+      isAdminUser
         ? this.executeAdminAICommand(chatId, textWithoutMention)
-        : this.sendNoPermissionMessage(chatId)
-      : this.generateResponse(chatId, textWithoutMention);
+        : this.sendNoPermissionMessage(chatId);
+    } else {
+      this.findCommand(chatId, textWithoutMention);
+    }
+  };
+
+  private findCommand = (chatId: number, textWithoutMention: string): void => {
+    const includePrevResp = textWithoutMention.startsWith("+");
+    const text = includePrevResp
+      ? textWithoutMention.slice(1)
+      : textWithoutMention;
+
+    if (textWithoutMention.includes("code:")) {
+      this.generateCode(chatId, text, includePrevResp);
+    } else {
+      this.generateResponse(chatId, text, includePrevResp);
+    }
   };
 
   private changeModel = async (chatId: number, text: string): Promise<void> => {
@@ -77,6 +94,37 @@ export default class OpenAIBot extends BaseBot {
     }
   };
 
+  private generateCode = async (
+    chatId: number,
+    text: string,
+    includePrevResp: boolean
+  ): Promise<void> => {
+    try {
+      const resp = await this.openAIClient.generateCode(text, includePrevResp);
+      const reply = resp.data.reply;
+      this.sendText(chatId, reply);
+    } catch (err) {
+      this.sendText(chatId, JSON.stringify(err));
+    }
+  };
+
+  private generateResponse = async (
+    chatId: number,
+    text: string,
+    includePrevResp: boolean
+  ): Promise<void> => {
+    try {
+      const resp = await this.openAIClient.generateResponse(
+        text,
+        includePrevResp
+      );
+      const reply = resp.data.reply;
+      this.sendText(chatId, reply);
+    } catch (err) {
+      this.sendText(chatId, JSON.stringify(err));
+    }
+  };
+
   private isAdminAICommand = (text: string): boolean => {
     const adminAICommands: string[] = Object.values(COMMANDS_ADMIN_AI);
     return adminAICommands.some(command => text.startsWith(command));
@@ -102,19 +150,6 @@ export default class OpenAIBot extends BaseBot {
       const textModels = models.map(model => `${model.id}`).join(",\n");
 
       const reply = `Here are the current list of all openAI models:\n${textModels}`;
-      this.sendText(chatId, reply);
-    } catch (err) {
-      this.sendText(chatId, JSON.stringify(err));
-    }
-  };
-
-  private generateResponse = async (
-    chatId: number,
-    text: string
-  ): Promise<void> => {
-    try {
-      const resp = await this.openAIClient.generateResponse(text);
-      const reply = resp.data.reply;
       this.sendText(chatId, reply);
     } catch (err) {
       this.sendText(chatId, JSON.stringify(err));

@@ -21,22 +21,26 @@ export default abstract class BaseBot {
 
   public start = async (chatId?: number): Promise<void> => {
     // Get and save bot info to be used next time
-    this.botInfo = await this.bot.getMe();
+    this.botInfo = await this.getBot().getMe();
 
     // Proceed when there is info, with up to 3 tries
     if (this.botInfo) {
-      this.bot.onText(this.getBotMentionRegex(), this.onReceivedText);
-      this.setStartState(true);
+      // Bot specific starting operations
+      this.customStart();
 
-      // This will only run when started from telegram, will not run when start on server
-      chatId && this.bot.sendMessage(chatId, "Bot started");
+      // Listen for messages
+      this.getBot().onText(this.getBotMentionRegex(), this.onReceivedText);
+
+      this.setStartState(true);
     } else if (this.tries) {
       this.tries--;
       this.start(chatId);
     } else {
-      console.error("Bot failed to start");
+      // Todo: Send message to admin to say bot have error
     }
   };
+
+  protected abstract customStart(): void;
 
   protected abstract executeCommand(
     chatId: number,
@@ -121,8 +125,8 @@ export default abstract class BaseBot {
   private stop = (chatId: number): void => {
     if (this.started) {
       this.setStartState(false);
-      this.bot.stopPolling();
-      this.bot.sendMessage(chatId, "Bot has stopped successfully");
+      this.getBot().stopPolling();
+      this.getBot().sendMessage(chatId, "Bot has stopped successfully");
     }
   };
 }

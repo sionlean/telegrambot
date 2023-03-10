@@ -1,9 +1,10 @@
 export enum API_DIRECTIONS {}
 
 export enum API_OPEN_AI {
-  GENERATE_RESPONSE = "/generateResponse",
   CHANGE_MODEL = "/changeModel",
   CURRENT_MODEL = "/currentModel",
+  GENERATE_CODE = "/generateCode",
+  GENERATE_RESPONSE = "/generateResponse",
   LIST_AVAILABLE_MODELS = "/listAvailableModels",
   LIST_OPEN_AI_MODELS = "/listOpenAIModels",
 }

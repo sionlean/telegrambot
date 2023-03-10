@@ -1,16 +1,19 @@
 // External Modules
 const fetch = require("node-fetch");
 
+// Local Modules
+import TokenAuthenticator from "../lib/tokenAuthenticator";
+
 // Constants
 import { HTTP_METHOD } from "../constants";
 
-export default class FetchClient {
-  private access_token: string | undefined = undefined;
+export default abstract class FetchClient {
+  private tokenAuthenticator: TokenAuthenticator;
   private serverUrl: string;
 
   constructor(serverUrl = process.env.SERVER_URL!) {
     this.serverUrl = serverUrl;
-    this.setToken();
+    this.tokenAuthenticator = TokenAuthenticator.getInstance();
   }
 
   protected get = async (endpoint: string, params: Object): Promise<any> => {
@@ -18,9 +21,10 @@ export default class FetchClient {
       const cleanedParams = this.cleanUndefinedAndNullParams(params);
       const encoded = this.encodeParams(cleanedParams);
       const newUrl = `${this.serverUrl}${endpoint}?${encoded}`;
+      const headers = await this.getFetchHeader();
 
       const response = await fetch(newUrl, {
-        headers: this.getFetchHeader(),
+        headers,
         method: HTTP_METHOD.GET,
       });
 
@@ -34,9 +38,10 @@ export default class FetchClient {
     try {
       const cleanedParams = this.cleanUndefinedAndNullParams(params);
       const newUrl = `${this.serverUrl}${endpoint}`;
+      const headers = await this.getFetchHeader();
 
       const response = await fetch(newUrl, {
-        headers: this.getFetchHeader(),
+        headers,
         method: HTTP_METHOD.POST,
         body: JSON.stringify(cleanedParams),
       });
@@ -58,27 +63,6 @@ export default class FetchClient {
     return params;
   };
 
-  private customFetch = async (
-    method: HTTP_METHOD,
-    url: string,
-    params: Object
-  ) => {
-    const cleanedParams = this.cleanUndefinedAndNullParams(params);
-    const newUrl =
-      method === HTTP_METHOD.GET
-        ? `${url}?${this.encodeParams(cleanedParams)}`
-        : url;
-
-    const response = await fetch(newUrl, {
-      headers: this.getFetchHeader(),
-      method: method,
-      body:
-        method === HTTP_METHOD.POST ? JSON.stringify(cleanedParams) : undefined,
-    });
-
-    return await response.json();
-  };
-
   private encodeParams = (params: { [key: string]: any }): string => {
     return Object.keys(params)
       .map(function (key) {
@@ -87,38 +71,11 @@ export default class FetchClient {
       .join("&");
   };
 
-  private getFetchHeader = (): HeadersInit => {
+  private getFetchHeader = async (): Promise<HeadersInit> => {
+    const token = await this.tokenAuthenticator.getToken();
     return {
-      Authorization: `Bearer ${this.access_token}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
-  };
-
-  private setToken = async (): Promise<void> => {
-    const url = `${process.env.SERVER_URL}/auth/getToken`;
-    try {
-      const response = await this.customFetch(HTTP_METHOD.POST, url, {
-        password: process.env.SERVER_PASSWORD,
-      });
-
-      if (response.error) throw response.error;
-
-      this.access_token = response.access_token;
-    } catch (err: unknown) {
-      this.onTokenError(err);
-    }
-  };
-
-  private onTokenError = (err: unknown): void => {
-    console.error(err);
-
-    if (err instanceof Object && "code" in err) {
-      const code = err.code;
-
-      switch (code) {
-        case "INVALID_PASSWORD":
-          this.setToken();
-      }
-    }
   };
 }
