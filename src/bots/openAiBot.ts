@@ -9,7 +9,7 @@ import OpenAIClient from "../apis/openAIClient";
 import { checkIsAdminUsername } from "../utils";
 
 // Constants
-import { COMMANDS_ADMIN_AI } from "../constants";
+import { COMMANDS_ADMIN_AI, TYPE_AI_QUERY } from "../constants";
 
 export default class OpenAIBot extends BaseBot {
   private openAIClient: OpenAIClient = new OpenAIClient();
@@ -32,20 +32,7 @@ export default class OpenAIBot extends BaseBot {
         ? this.executeAdminAICommand(chatId, textWithoutMention)
         : this.sendNoPermissionMessage(chatId);
     } else {
-      this.findCommand(chatId, textWithoutMention);
-    }
-  };
-
-  private findCommand = (chatId: number, textWithoutMention: string): void => {
-    const includePrevResp = textWithoutMention.startsWith("+");
-    const text = includePrevResp
-      ? textWithoutMention.slice(1)
-      : textWithoutMention;
-
-    if (textWithoutMention.includes("code:")) {
-      this.generateCode(chatId, text, includePrevResp);
-    } else {
-      this.generateResponse(chatId, text, includePrevResp);
+      this.generateResponse(chatId, textWithoutMention);
     }
   };
 
@@ -94,29 +81,23 @@ export default class OpenAIBot extends BaseBot {
     }
   };
 
-  private generateCode = async (
-    chatId: number,
-    text: string,
-    includePrevResp: boolean
-  ): Promise<void> => {
-    try {
-      const resp = await this.openAIClient.generateCode(text, includePrevResp);
-      const reply = resp.data.reply;
-      this.sendText(chatId, reply);
-    } catch (err) {
-      this.sendText(chatId, JSON.stringify(err));
-    }
-  };
-
   private generateResponse = async (
     chatId: number,
-    text: string,
-    includePrevResp: boolean
+    textWithoutMention: string
   ): Promise<void> => {
+    const includePrevResp = textWithoutMention.startsWith("+");
+    const text = includePrevResp
+      ? textWithoutMention.slice(1)
+      : textWithoutMention;
+    const type = textWithoutMention.includes("code:")
+      ? TYPE_AI_QUERY.CODE
+      : TYPE_AI_QUERY.ASSIT;
+
     try {
       const resp = await this.openAIClient.generateResponse(
         text,
-        includePrevResp
+        includePrevResp,
+        type
       );
       const reply = resp.data.reply;
       this.sendText(chatId, reply);

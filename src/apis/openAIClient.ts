@@ -11,7 +11,7 @@ import {
 } from "../interfaces/openAIApiInterfaces";
 
 // Constants
-import { API_OPEN_AI } from "../constants";
+import { API_OPEN_AI, TYPE_AI_QUERY } from "../constants";
 
 export default class OpenAIClient extends FetchClient {
   constructor() {
@@ -26,23 +26,15 @@ export default class OpenAIClient extends FetchClient {
     return await this.get(API_OPEN_AI.CURRENT_MODEL, {});
   };
 
-  generateCode = async (
-    text: string,
-    includePrevResp: boolean
-  ): Promise<AIResp> => {
-    return await this.post(API_OPEN_AI.GENERATE_CODE, {
-      includePrevResp,
-      text,
-    });
-  };
-
   generateResponse = async (
     text: string,
-    includePrevResp: boolean
+    includePrevResp: boolean,
+    type: TYPE_AI_QUERY
   ): Promise<AIResp> => {
     return await this.post(API_OPEN_AI.GENERATE_RESPONSE, {
       includePrevResp,
       text,
+      type,
     });
   };
 

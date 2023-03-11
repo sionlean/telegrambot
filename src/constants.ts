@@ -3,7 +3,6 @@ export enum API_DIRECTIONS {}
 export enum API_OPEN_AI {
   CHANGE_MODEL = "/changeModel",
   CURRENT_MODEL = "/currentModel",
-  GENERATE_CODE = "/generateCode",
   GENERATE_RESPONSE = "/generateResponse",
   LIST_AVAILABLE_MODELS = "/listAvailableModels",
   LIST_OPEN_AI_MODELS = "/listOpenAIModels",
@@ -29,4 +28,9 @@ export enum HTTP_METHOD {
   PATCH = "PATCH",
   POST = "POST",
   PUT = "PUT",
+}
+
+export enum TYPE_AI_QUERY {
+  ASSIT = "assit",
+  CODE = "code",
 }
