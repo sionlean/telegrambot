@@ -3,7 +3,7 @@ require("dotenv").config();
 
 // Local Modules
 import AdminBot from "./bots/adminBot";
-import OpenAIBot from "./bots/openAiBots";
+import OpenAIBot from "./bots/openAIBot";
 
 // Initialize bots
 const adminBot = new AdminBot(process.env.SION_ADMIN_BOT_API_TOKEN!);
