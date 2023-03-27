@@ -27,19 +27,21 @@ export default class TokenAuthenticator {
   };
 
   private static checkAndSetToken = async (): Promise<void> => {
-    if (!TokenAuthenticator.checkExpiration()) {
+    if (TokenAuthenticator.checkIsExpiredToken()) {
+      // Todo: Link up with adminBot to announce to admin token is expired, renewing
       await TokenAuthenticator.updateToken();
+      // Todo: Link up with adminBot to announce to admin token is expired, renewed
     }
   };
 
-  private static checkExpiration = (): boolean => {
+  private static checkIsExpiredToken = (): boolean => {
     if (TokenAuthenticator._expiry) {
       const oneDayMilliseconds = 24 * 60 * 60 * 1000;
       return (
-        TokenAuthenticator._expiry >= new Date().getTime() + oneDayMilliseconds
+        TokenAuthenticator._expiry < new Date().getTime() + oneDayMilliseconds
       );
     }
-    return false;
+    return true;
   };
 
   private static onTokenError = (err: unknown): void => {

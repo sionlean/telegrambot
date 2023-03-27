@@ -6,6 +6,7 @@ import {
   AIResp,
   ChangeModelResp,
   CurrentModelResp,
+  GetEstimatedCostResp,
   ListAvailableModelsResp,
   ListOpenAIModelResp,
 } from "../interfaces/openAIApiInterfaces";
@@ -36,6 +37,10 @@ export default class OpenAIClient extends FetchClient {
       text,
       type,
     });
+  };
+
+  getEstimatedCost = async (): Promise<GetEstimatedCostResp> => {
+    return await this.get(API_OPEN_AI.GET_ESIMATED_COST, {});
   };
 
   listAvailableModels = async (): Promise<ListAvailableModelsResp> => {

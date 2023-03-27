@@ -50,7 +50,7 @@ export default class OpenAIBot extends BaseBot {
   private currentModel = async (chatId: number): Promise<void> => {
     try {
       const resp = await this.openAIClient.currentModel();
-      const model = resp.data.model;
+      const model = resp.model;
       this.sendText(chatId, `The current AI model used is ${model}`);
     } catch (err) {
       this.sendText(chatId, "Failed to get current model");
@@ -71,6 +71,9 @@ export default class OpenAIBot extends BaseBot {
         break;
       case COMMANDS_ADMIN_AI.CURRENT_MODEL:
         this.currentModel(chatId);
+        break;
+      case COMMANDS_ADMIN_AI.GET_ESIMATED_COST:
+        this.getEstimatedCost(chatId);
         break;
       case COMMANDS_ADMIN_AI.LIST_AVAILABLE_MODELS:
         this.listAvailableModels(chatId);
@@ -99,8 +102,18 @@ export default class OpenAIBot extends BaseBot {
         includePrevResp,
         type
       );
-      const reply = resp.data.reply;
-      this.sendText(chatId, reply);
+
+      this.sendText(chatId, resp.reply);
+    } catch (err) {
+      this.sendText(chatId, JSON.stringify(err));
+    }
+  };
+
+  private getEstimatedCost = async (chatId: number): Promise<void> => {
+    try {
+      const resp = await this.openAIClient.getEstimatedCost();
+      const text = `The current estimated cost from startup is ${resp.cost}`;
+      this.sendText(chatId, text);
     } catch (err) {
       this.sendText(chatId, JSON.stringify(err));
     }
@@ -114,7 +127,7 @@ export default class OpenAIBot extends BaseBot {
   private listAvailableModels = async (chatId: number): Promise<void> => {
     try {
       const resp = await this.openAIClient.listAvailableModels();
-      const models = resp.data.models;
+      const models = resp.models;
       const reply = `Here are the current list of models:\n${models.join(
         ",\n"
       )}`;
@@ -127,7 +140,7 @@ export default class OpenAIBot extends BaseBot {
   private listOpenAIModels = async (chatId: number): Promise<void> => {
     try {
       const resp = await this.openAIClient.listOpenAIModels();
-      const models = resp.data.models;
+      const models = resp.models;
       const textModels = models.map(model => `${model.id}`).join(",\n");
 
       const reply = `Here are the current list of all openAI models:\n${textModels}`;

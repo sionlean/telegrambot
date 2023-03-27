@@ -28,7 +28,12 @@ export default abstract class FetchClient {
         method: HTTP_METHOD.GET,
       });
 
-      return await response.json();
+      const jsonResp = await response.json();
+      if (jsonResp.error) {
+        throw jsonResp.error;
+      } else {
+        return jsonResp.data;
+      }
     } catch (err) {
       throw err;
     }
@@ -46,7 +51,12 @@ export default abstract class FetchClient {
         body: JSON.stringify(cleanedParams),
       });
 
-      return await response.json();
+      const jsonResp = await response.json();
+      if (jsonResp.error) {
+        throw jsonResp.error;
+      } else {
+        return jsonResp.data;
+      }
     } catch (err) {
       throw err;
     }

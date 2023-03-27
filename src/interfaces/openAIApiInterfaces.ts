@@ -1,21 +1,23 @@
 export interface AIResp {
-  data: { reply: string };
+  reply: string;
 }
 
 export interface ChangeModelResp {
-  data: { message: string };
+  message: string;
 }
 
 export interface CurrentModelResp {
-  data: { model: string };
+  model: string;
+}
+
+export interface GetEstimatedCostResp {
+  cost: string;
 }
 
 export interface ListAvailableModelsResp {
-  data: { models: string[] };
+  models: string[];
 }
 
 export interface ListOpenAIModelResp {
-  data: {
-    models: { id: string; object: string; created: number; owned_by: string }[];
-  };
+  models: { id: string; object: string; created: number; owned_by: string }[];
 }
