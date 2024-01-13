@@ -8,7 +8,6 @@ import BaseBot from "./baseBot";
 import { checkIsAdminUsername } from "../utils";
 
 // Constants
-import { COMMANDS_ADMIN_AI } from "../constants";
 
 export default class AdminBot extends BaseBot {
   constructor(token: string) {

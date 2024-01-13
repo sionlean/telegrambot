@@ -3,7 +3,7 @@ import { Message } from "node-telegram-bot-api";
 
 // Local Modules
 import BaseBot from "./baseBot";
-import OpenAIClient from "../apis/openAIClient";
+import AIClient from "../apis/aiClient";
 
 // Utils
 import { checkIsAdminUsername } from "../utils";
@@ -12,7 +12,7 @@ import { checkIsAdminUsername } from "../utils";
 import { COMMANDS_ADMIN_AI, TYPE_AI_QUERY } from "../constants";
 
 export default class OpenAIBot extends BaseBot {
-  private openAIClient: OpenAIClient = new OpenAIClient();
+  private AIClient: AIClient = new AIClient();
   constructor(token: string) {
     super(token);
   }
@@ -39,7 +39,7 @@ export default class OpenAIBot extends BaseBot {
   private changeModel = async (chatId: number, text: string): Promise<void> => {
     const model = text.split(" ")[1];
     try {
-      await this.openAIClient.changeModel(model);
+      await this.AIClient.changeModel(model);
       this.sendText(chatId, `AI Model changed to: ${model} successfully`);
     } catch (err) {
       this.sendText(chatId, `Failed to change to ${model}`);
@@ -49,7 +49,7 @@ export default class OpenAIBot extends BaseBot {
 
   private currentModel = async (chatId: number): Promise<void> => {
     try {
-      const resp = await this.openAIClient.currentModel();
+      const resp = await this.AIClient.currentModel();
       const model = resp.model;
       this.sendText(chatId, `The current AI model used is ${model}`);
     } catch (err) {
@@ -59,7 +59,7 @@ export default class OpenAIBot extends BaseBot {
   };
 
   private executeAdminAICommand = (chatId: number, text: string): void => {
-    const adminCommand = Object.values(COMMANDS_ADMIN_AI).find(command => {
+    const adminCommand = Object.values(COMMANDS_ADMIN_AI).find((command) => {
       return text.startsWith(command);
     });
 
@@ -97,7 +97,7 @@ export default class OpenAIBot extends BaseBot {
       : TYPE_AI_QUERY.ASSIT;
 
     try {
-      const resp = await this.openAIClient.generateResponse(
+      const resp = await this.AIClient.generateResponse(
         text,
         includePrevResp,
         type
@@ -111,7 +111,7 @@ export default class OpenAIBot extends BaseBot {
 
   private getEstimatedCost = async (chatId: number): Promise<void> => {
     try {
-      const resp = await this.openAIClient.getEstimatedCost();
+      const resp = await this.AIClient.getEstimatedCost();
       const text = `The current estimated cost from startup is ${resp.cost}`;
       this.sendText(chatId, text);
     } catch (err) {
@@ -121,12 +121,12 @@ export default class OpenAIBot extends BaseBot {
 
   private isAdminAICommand = (text: string): boolean => {
     const adminAICommands: string[] = Object.values(COMMANDS_ADMIN_AI);
-    return adminAICommands.some(command => text.startsWith(command));
+    return adminAICommands.some((command) => text.startsWith(command));
   };
 
   private listAvailableModels = async (chatId: number): Promise<void> => {
     try {
-      const resp = await this.openAIClient.listAvailableModels();
+      const resp = await this.AIClient.listAvailableModels();
       const models = resp.models;
       const reply = `Here are the current list of models:\n${models.join(
         ",\n"
@@ -139,9 +139,9 @@ export default class OpenAIBot extends BaseBot {
 
   private listOpenAIModels = async (chatId: number): Promise<void> => {
     try {
-      const resp = await this.openAIClient.listOpenAIModels();
+      const resp = await this.AIClient.listOpenAIModels();
       const models = resp.models;
-      const textModels = models.map(model => `${model.id}`).join(",\n");
+      const textModels = models.map((model) => `${model.id}`).join(",\n");
 
       const reply = `Here are the current list of all openAI models:\n${textModels}`;
       this.sendText(chatId, reply);

@@ -1,6 +1,6 @@
 export enum API_DIRECTIONS {}
 
-export enum API_OPEN_AI {
+export enum API_AI {
   CHANGE_MODEL = "/changeModel",
   CURRENT_MODEL = "/currentModel",
   GENERATE_RESPONSE = "/generateResponse",

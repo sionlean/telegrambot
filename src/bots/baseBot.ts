@@ -96,7 +96,7 @@ export default abstract class BaseBot {
 
   private isAdminCommand = (text: string): boolean => {
     const adminCommands: string[] = Object.values(COMMANDS_ADMIN);
-    return adminCommands.some(command => command === text);
+    return adminCommands.some((command) => command === text);
   };
 
   private onReceivedText = (message: TelegramBot.Message): void => {
