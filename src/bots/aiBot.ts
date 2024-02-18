@@ -2,37 +2,47 @@
 import { Message } from "node-telegram-bot-api";
 
 // Local Modules
-import BaseBot from "./baseBot";
 import AIClient from "../apis/aiClient";
+import BaseBot from "./baseBot";
 
 // Utils
 import { checkIsAdminUsername } from "../utils";
 
 // Constants
-import { COMMANDS_ADMIN_AI, TYPE_AI_QUERY } from "../constants";
+import { BOT_IDENTIFIER, COMMANDS_ADMIN_AI, TYPE_AI_QUERY } from "../constants";
 
-export default class OpenAIBot extends BaseBot {
+export default class AIBot extends BaseBot {
+  private static instance: AIBot | null = null;
   private AIClient: AIClient = new AIClient();
-  constructor(token: string) {
-    super(token);
+
+  private constructor(token: string) {
+    super(token, BOT_IDENTIFIER.AI);
   }
 
-  protected customStart = async (): Promise<void> => {};
+  public static getInstance(token: string): AIBot {
+    if (!AIBot.instance) {
+      AIBot.instance = new AIBot(token);
+    }
+
+    return AIBot.instance;
+  }
+
+  protected customStart = (): void => {};
 
   protected executeCommand = async (
     chatId: number,
     message: Message
   ): Promise<void> => {
-    const textWithoutMention = this.getTextWithoutMention(message?.text!);
-    const isAdminAICommand = this.isAdminAICommand(textWithoutMention);
+    const { text } = this.getTextInfo(message?.text!);
+    const isAdminCommand = this.isBotSpecificAdminCommand(text);
     const isAdminUser = checkIsAdminUsername(message?.from?.username);
 
-    if (isAdminAICommand) {
+    if (isAdminCommand) {
       isAdminUser
-        ? this.executeAdminAICommand(chatId, textWithoutMention)
+        ? this.executeAdminBotCommand(chatId, text)
         : this.sendNoPermissionMessage(chatId);
     } else {
-      this.generateResponse(chatId, textWithoutMention);
+      this.generateResponse(chatId, text);
     }
   };
 
@@ -58,7 +68,7 @@ export default class OpenAIBot extends BaseBot {
     }
   };
 
-  private executeAdminAICommand = (chatId: number, text: string): void => {
+  private executeAdminBotCommand = (chatId: number, text: string): void => {
     const adminCommand = Object.values(COMMANDS_ADMIN_AI).find((command) => {
       return text.startsWith(command);
     });
@@ -119,7 +129,7 @@ export default class OpenAIBot extends BaseBot {
     }
   };
 
-  private isAdminAICommand = (text: string): boolean => {
+  private isBotSpecificAdminCommand = (text: string): boolean => {
     const adminAICommands: string[] = Object.values(COMMANDS_ADMIN_AI);
     return adminAICommands.some((command) => text.startsWith(command));
   };

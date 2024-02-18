@@ -12,11 +12,11 @@ import {
 } from "../interfaces/AIApiInterfaces";
 
 // Constants
-import { API_AI, TYPE_AI_QUERY } from "../constants";
+import { API_AI, MAIN_ROUTES, TYPE_AI_QUERY } from "../constants";
 
 export default class AIClient extends FetchClient {
   constructor() {
-    super(`${process.env.SERVER_URL}/ai`);
+    super(`${process.env.SERVER_URL}${MAIN_ROUTES.AI}`);
   }
 
   changeModel = async (model: string): Promise<ChangeModelResp> => {

@@ -1,4 +1,6 @@
-export enum API_DIRECTIONS {}
+export enum API_MAP {
+  GET_LOCATION = "/getLocation",
+}
 
 export enum API_AI {
   CHANGE_MODEL = "/changeModel",
@@ -7,6 +9,12 @@ export enum API_AI {
   GET_ESIMATED_COST = "/getEstimatedCost",
   LIST_AVAILABLE_MODELS = "/listAvailableModels",
   LIST_OPEN_AI_MODELS = "/listOpenAIModels",
+}
+
+export enum BOT_IDENTIFIER {
+  ADMIN = "%admin",
+  AI = "%ai",
+  MAP = "%map",
 }
 
 export enum COMMANDS_ADMIN {
@@ -22,7 +30,10 @@ export enum COMMANDS_ADMIN_AI {
   LIST_OPEN_AI_MODELS = "/listAll",
 }
 
-export enum COMMANDS_ADMIN_DIRECTIONS {}
+// TODO: To be implemented
+export enum COMMANDS_ADMIN_MAP {
+  SET_LOCATION = "/setLocation",
+}
 
 export enum HTTP_METHOD {
   DELETE = "DELETE",
@@ -30,6 +41,12 @@ export enum HTTP_METHOD {
   PATCH = "PATCH",
   POST = "POST",
   PUT = "PUT",
+}
+
+export enum MAIN_ROUTES {
+  AI = "/ai",
+  AUTHENTICATION = "/auth",
+  MAPS = "/maps",
 }
 
 export enum TYPE_AI_QUERY {

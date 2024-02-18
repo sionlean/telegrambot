@@ -14,9 +14,11 @@ export default abstract class BaseBot {
   private botInfo: TelegramBot.User | undefined = undefined;
   private started = false;
   private tries = 3;
-  constructor(token: string) {
+  private botIdentifier: string;
+  constructor(token: string, identifier: string) {
     const options = this.setBotOptions();
     this.bot = new TelegramBot(token, options);
+    this.botIdentifier = identifier;
   }
 
   public start = async (chatId?: number): Promise<void> => {
@@ -55,8 +57,14 @@ export default abstract class BaseBot {
     return this.botInfo;
   };
 
-  protected getTextWithoutMention = (text: string): string => {
-    return text.substring(this.getBotMention().length)?.trim();
+  protected getTextInfo = (text: string): { mention: string; text: string } => {
+    const [mention, ...rest] = text.split(" ");
+    return { mention, text: rest.join(" ").trim() };
+  };
+
+  protected getTextInfoParams = (text: string): string => {
+    const [mention, ..._] = text.split(" ");
+    return mention.substring(1);
   };
 
   protected sendNoPermissionMessage = (chatId: number): void => {
@@ -85,13 +93,8 @@ export default abstract class BaseBot {
     }
   };
 
-  private getBotMention = (): string => {
-    const botName = this.botInfo!.username;
-    return `@${botName}`;
-  };
-
   private getBotMentionRegex = (): RegExp => {
-    return new RegExp("^" + this.getBotMention());
+    return new RegExp("^" + this.botIdentifier, "i");
   };
 
   private isAdminCommand = (text: string): boolean => {
@@ -102,15 +105,16 @@ export default abstract class BaseBot {
   private onReceivedText = (message: TelegramBot.Message): void => {
     const { chat, from, text = "" } = message;
     const { id: chatId } = chat;
-    const textWithoutMention = this.getTextWithoutMention(text);
-    const isAdminCommand = this.isAdminCommand(text);
-    const isAdminUser = checkIsAdminUsername(from?.username);
+    const textInfo = this.getTextInfo(text);
 
     // Ignore empty text
-    if (textWithoutMention.trim()) {
-      isAdminUser && isAdminCommand
-        ? this.executeAdminCommand(chatId, textWithoutMention)
-        : this.executeCommand(chatId, message);
+    if (textInfo.mention || textInfo.text) {
+      if (this.isAdminCommand(textInfo.mention)) {
+        checkIsAdminUsername(from?.username) &&
+          this.executeAdminCommand(chatId, textInfo.mention);
+      } else {
+        this.executeCommand(chatId, message);
+      }
     }
   };
 

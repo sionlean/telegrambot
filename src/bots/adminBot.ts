@@ -8,15 +8,28 @@ import BaseBot from "./baseBot";
 import { checkIsAdminUsername } from "../utils";
 
 // Constants
+import { BOT_IDENTIFIER } from "../constants";
+
+// Constants
 
 export default class AdminBot extends BaseBot {
-  constructor(token: string) {
-    super(token);
+  private static instance: AdminBot | null = null;
+
+  private constructor(token: string) {
+    super(token, BOT_IDENTIFIER.ADMIN);
   }
 
-  protected customStart(): void {
-    this.sendToAdmin("Bot started");
+  public static getInstance(token: string): AdminBot {
+    if (!AdminBot.instance) {
+      AdminBot.instance = new AdminBot(token);
+    }
+
+    return AdminBot.instance;
   }
+
+  protected customStart = (): void => {
+    this.sendToAdmin("Bot started");
+  };
 
   protected executeCommand = (chatId: number, message: Message): void => {};
 
