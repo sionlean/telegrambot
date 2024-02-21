@@ -12,6 +12,8 @@ AdminBot.getInstance(process.env.SION_ADMIN_BOT_API_TOKEN!).start();
 AIBot.getInstance(process.env.SION_AI_BOT_API_TOKEN!).start();
 MapBot.getInstance(process.env.SION_MAP_BOT_API_TOKEN!).start();
 
+console.log("started");
+
 // const bots = [
 //   new AdminBot(process.env.SION_ADMIN_BOT_API_TOKEN!),
 //   new AIBot(process.env.SION_AI_BOT_API_TOKEN!),

@@ -3,7 +3,11 @@ export interface AIResp {
 }
 
 export interface ChangeModelResp {
-  message: string;
+  reply: string;
+}
+
+export interface ChangeProviderResp {
+  reply: string;
 }
 
 export interface CurrentModelResp {

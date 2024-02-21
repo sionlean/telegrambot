@@ -57,6 +57,20 @@ export default class AIBot extends BaseBot {
     }
   };
 
+  private changeProvider = async (
+    chatId: number,
+    text: string
+  ): Promise<void> => {
+    const provider = text.split(" ")[1];
+    try {
+      await this.AIClient.changeProvider(provider);
+      this.sendText(chatId, `AI Model changed to: ${provider} successfully`);
+    } catch (err) {
+      this.sendText(chatId, `Failed to change to ${provider}`);
+      this.sendText(chatId, JSON.stringify(err));
+    }
+  };
+
   private currentModel = async (chatId: number): Promise<void> => {
     try {
       const resp = await this.AIClient.currentModel();
@@ -78,6 +92,9 @@ export default class AIBot extends BaseBot {
     switch (adminCommand) {
       case COMMANDS_ADMIN_AI.CHANGE_MODEL:
         this.changeModel(chatId, text);
+        break;
+      case COMMANDS_ADMIN_AI.CHANGE_PROVIDER:
+        this.changeProvider(chatId, text);
         break;
       case COMMANDS_ADMIN_AI.CURRENT_MODEL:
         this.currentModel(chatId);

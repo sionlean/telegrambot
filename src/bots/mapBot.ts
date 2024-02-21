@@ -61,7 +61,7 @@ export default class MapBot extends BaseBot {
   ): Promise<void> => {
     try {
       const resp = await this.MapClient.getLocation(textWithoutMention);
-      this.sendText(chatId, JSON.stringify(resp.places));
+      this.sendText(chatId, JSON.stringify(resp.location));
     } catch (err) {
       this.sendText(chatId, JSON.stringify(err));
     }

@@ -4,6 +4,7 @@ export enum API_MAP {
 
 export enum API_AI {
   CHANGE_MODEL = "/changeModel",
+  CHANGE_PROVIDER = "/changeProvider",
   CURRENT_MODEL = "/currentModel",
   GENERATE_RESPONSE = "/generateResponse",
   GET_ESIMATED_COST = "/getEstimatedCost",
@@ -23,7 +24,8 @@ export enum COMMANDS_ADMIN {
 }
 
 export enum COMMANDS_ADMIN_AI {
-  CHANGE_MODEL = "/change",
+  CHANGE_MODEL = "/changeModel",
+  CHANGE_PROVIDER = "changeProvider",
   CURRENT_MODEL = "/current",
   GET_ESIMATED_COST = "/cost",
   LIST_AVAILABLE_MODELS = "/list",

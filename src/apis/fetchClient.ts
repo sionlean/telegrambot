@@ -1,5 +1,5 @@
 // External Modules
-const fetch = require("node-fetch");
+import fetch, { HeaderInit } from "node-fetch";
 
 // Local Modules
 import TokenAuthenticator from "../lib/tokenAuthenticator";
@@ -34,8 +34,8 @@ export default abstract class FetchClient {
       } else {
         return jsonResp.data;
       }
-    } catch (err) {
-      throw err;
+    } catch (err: any) {
+      throw err.message || err;
     }
   };
 
@@ -51,14 +51,19 @@ export default abstract class FetchClient {
         body: JSON.stringify(cleanedParams),
       });
 
-      const jsonResp = await response.json();
-      if (jsonResp.error) {
-        throw jsonResp.error;
+      if (response.status !== 200) {
+        const { status, statusText } = response;
+        throw new Error(`${status}: ${statusText}`);
       } else {
-        return jsonResp.data;
+        const jsonResp = await response.json();
+        if (jsonResp.error) {
+          throw jsonResp.error;
+        } else {
+          return jsonResp.data;
+        }
       }
-    } catch (err) {
-      throw err;
+    } catch (err: any) {
+      throw err?.message || err;
     }
   };
 
@@ -81,7 +86,7 @@ export default abstract class FetchClient {
       .join("&");
   };
 
-  private getFetchHeader = async (): Promise<HeadersInit> => {
+  private getFetchHeader = async (): Promise<HeaderInit> => {
     const token = await this.tokenAuthenticator.getToken();
     return {
       Authorization: `Bearer ${token}`,

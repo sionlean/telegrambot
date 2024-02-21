@@ -5,6 +5,7 @@ import FetchClient from "./fetchClient";
 import {
   AIResp,
   ChangeModelResp,
+  ChangeProviderResp,
   CurrentModelResp,
   GetEstimatedCostResp,
   ListAvailableModelsResp,
@@ -21,6 +22,10 @@ export default class AIClient extends FetchClient {
 
   changeModel = async (model: string): Promise<ChangeModelResp> => {
     return await this.post(API_AI.CHANGE_MODEL, { model });
+  };
+
+  changeProvider = async (provider: string): Promise<ChangeProviderResp> => {
+    return await this.post(API_AI.CHANGE_PROVIDER, { provider });
   };
 
   currentModel = async (): Promise<CurrentModelResp> => {

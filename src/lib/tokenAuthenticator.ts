@@ -66,6 +66,7 @@ export default class TokenAuthenticator {
         method: HTTP_METHOD.POST,
         body: JSON.stringify({ password: process.env.SERVER_PASSWORD }),
       });
+
       const jsonResponse = await response.json();
 
       TokenAuthenticator._token = jsonResponse.access_token;

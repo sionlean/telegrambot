@@ -13,6 +13,6 @@ export default class MapClient extends FetchClient {
   }
 
   getLocation = async (query: string): Promise<GetLocationResp> => {
-    return await this.get(API_MAP.GET_LOCATION, { query });
+    return await this.post(API_MAP.GET_LOCATION, { query });
   };
 }
